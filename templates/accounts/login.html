@@ -1,0 +1,18 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Login{% endblock %}
+{% block headline %}Ride safer with real-time speed awareness{% endblock %}
+{% block form_title %}Login{% endblock %}
+{% block form %}
+<form method="post" novalidate class="auth-form">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% if form.non_field_errors %}
+    <div class="form-alert" role="alert"><svg class="ico"><use href="#i-alert"/></svg>{{ form.non_field_errors|join:" " }}</div>
+  {% endif %}
+  {% include "partials/field.html" with field=form.username placeholder="Enter Username" autocomplete="username" %}
+  {% include "partials/field.html" with field=form.password placeholder="Enter Password" autocomplete="current-password" %}
+  <button type="submit" class="btn-enter">Enter</button>
+  <div class="divider"><span>Or</span></div>
+  <a class="btn-outline" href="{% url 'accounts:register' %}">Create a new account</a>
+</form>
+{% endblock %}

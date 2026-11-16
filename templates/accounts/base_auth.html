@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+{# Shared layout for Login and Register, based on the provided login template: image left, form right. #}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/auth.css' %}">{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+{% block body %}
+<main class="auth-shell">
+  <section class="auth-visual" aria-hidden="true">
+    <img src="{% static 'img/auth-panel.svg' %}" alt="">
+  </section>
+  <section class="auth-panel">
+    <span class="bubble b1"></span><span class="bubble b2"></span><span class="bubble b3"></span><span class="bubble b4"></span>
+    <div class="auth-content">
+      <a class="auth-brand" href="{% url 'accounts:login' %}"><svg class="ico"><use href="#i-logo"/></svg> Vigil</a>
+      <h1 class="auth-headline">{% block headline %}{% endblock %}</h1>
+      <h2 class="auth-title">{% block form_title %}{% endblock %}</h2>
+      {% block form %}{% endblock %}
+    </div>
+  </section>
+</main>
+{% endblock %}

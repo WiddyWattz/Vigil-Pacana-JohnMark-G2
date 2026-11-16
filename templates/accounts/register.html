@@ -1,0 +1,29 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Register{% endblock %}
+{% block headline %}Create your Vigil account and start riding smarter{% endblock %}
+{% block form_title %}Register{% endblock %}
+{% block form %}
+<form method="post" novalidate class="auth-form">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="form-alert" role="alert"><svg class="ico"><use href="#i-alert"/></svg>{{ form.non_field_errors|join:" " }}</div>
+  {% endif %}
+  <div class="row-2">
+    {% include "partials/field.html" with field=form.first_name placeholder="Enter First Name" autocomplete="given-name" %}
+    {% include "partials/field.html" with field=form.last_name placeholder="Enter Last Name" autocomplete="family-name" %}
+  </div>
+  <div class="row-2">
+    {% include "partials/field.html" with field=form.username placeholder="Enter Username" autocomplete="username" %}
+    {% include "partials/field.html" with field=form.contact_number placeholder="09XXXXXXXXX" autocomplete="tel" %}
+  </div>
+  {% include "partials/field.html" with field=form.email type="email" placeholder="Enter Email" autocomplete="email" %}
+  <div class="row-2">
+    {% include "partials/field.html" with field=form.password1 placeholder="Enter Password" autocomplete="new-password" %}
+    {% include "partials/field.html" with field=form.password2 placeholder="Confirm Password" autocomplete="new-password" %}
+  </div>
+  <p class="field-help">At least 8 characters, not too common, and not all numbers.</p>
+  <button type="submit" class="btn-enter">Create Account</button>
+  <div class="divider"><span>Or</span></div>
+  <a class="btn-outline" href="{% url 'accounts:login' %}">I already have an account</a>
+</form>
+{% endblock %}

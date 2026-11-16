@@ -1,0 +1,12 @@
+{# Renders one form field with the auth/profile styling. Usage: {% include "partials/field.html" with field=form.email placeholder="Enter Email" %} #}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="req" aria-hidden="true">*</span>{% endif %}</label>
+  <input type="{{ type|default:field.field.widget.input_type }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+    {% if field.value is not None and field.field.widget.input_type != 'password' %}value="{{ field.value }}"{% endif %}
+    placeholder="{{ placeholder|default:'' }}" {% if field.field.required %}required{% endif %}
+    {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+    {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %}
+    {% if field.errors %}aria-invalid="true" aria-describedby="{{ field.id_for_label }}_err"{% endif %}>
+  {% if field.errors %}<p class="field-error" id="{{ field.id_for_label }}_err">{{ field.errors|join:" " }}</p>{% endif %}
+  {% if help %}<p class="field-help">{{ help }}</p>{% endif %}
+</div>
