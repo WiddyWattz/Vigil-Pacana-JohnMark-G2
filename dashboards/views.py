@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Max, Q, Sum
 from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.decorators import role_required
 from accounts.models import LoginActivity, User
+from trips.models import SpeedAlert, Trip
 
 CHART_W, CHART_H = 300, 120  # size of the SVG drawing area in the "Weekly activity" card
 
@@ -84,6 +85,9 @@ def rider_dashboard(request):
     user = request.user
     percent, checklist = user.profile_completion()
     logins = user.login_activity.all()
+    my_trips = Trip.objects.filter(rider=user)
+    completed = my_trips.filter(status=Trip.Status.COMPLETED)
+    trip_totals = completed.aggregate(count=Count("id"), distance=Sum("distance_km"), top=Max("max_speed_kmh"))
     return render(request, "dashboards/user_dashboard.html", {
         "active": "dashboard",
         "total_logins": logins.count(),
@@ -95,6 +99,10 @@ def rider_dashboard(request):
         "checklist": checklist,
         "checklist_done": sum(1 for _, ok in checklist if ok),
         "recent_logins": logins[:2],
+        "trip_totals": trip_totals,
+        "alert_total": SpeedAlert.objects.filter(trip__rider=user).count(),
+        "recent_trips": my_trips.annotate(alert_count=Count("alerts"))[:2],
+        "active_trip": my_trips.filter(status=Trip.Status.ACTIVE).first(),
     })
 
 
@@ -131,6 +139,10 @@ def admin_dashboard(request):
         ],
         "recent_users": users.order_by("-date_joined")[:4],
         "recent_logins": LoginActivity.objects.select_related("user")[:2],
+        "trip_count": Trip.objects.filter(status=Trip.Status.COMPLETED).count(),
+        "trips_this_week": Trip.objects.filter(started_at__gte=week_ago).count(),
+        "alert_total": SpeedAlert.objects.count(),
+        "latest_trips": Trip.objects.select_related("rider").annotate(alert_count=Count("alerts"))[:5],
     })
 
 

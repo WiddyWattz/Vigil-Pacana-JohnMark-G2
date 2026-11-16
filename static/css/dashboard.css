@@ -90,8 +90,15 @@
   grid-template-areas:
     "overview weekly progress"
     "goals tasks tasks"
+    "latest latest latest"
     "projects projects projects";
 }
+.latest-trips { grid-area: latest; }
+.latest-trips .card-head h2 { flex: 0 1 auto; }
+.latest-trips .archive { margin-left: auto; }
+.trip-link { color: #000; text-decoration: none; }
+a.task-card { color: #000; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+a.task-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, .08); }
 .overview { grid-area: overview; }
 .weekly { grid-area: weekly; }
 .progress { grid-area: progress; }
@@ -275,7 +282,7 @@ a.project:hover { background: #1a1a1a; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1200px) {
-  .grid { grid-template-columns: 1fr 1fr; grid-template-areas: "overview weekly" "progress goals" "tasks tasks" "projects projects"; }
+  .grid { grid-template-columns: 1fr 1fr; grid-template-areas: "overview weekly" "progress goals" "tasks tasks" "latest latest" "projects projects"; }
 }
 @media (max-width: 900px) {
   .dash-shell { grid-template-columns: 1fr; padding: 16px; gap: 0; }
@@ -288,7 +295,7 @@ a.project:hover { background: #1a1a1a; }
   .profile-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
-  .grid { grid-template-columns: 1fr; grid-template-areas: "overview" "weekly" "progress" "goals" "tasks" "projects"; }
+  .grid { grid-template-columns: 1fr; grid-template-areas: "overview" "weekly" "progress" "goals" "tasks" "latest" "projects"; }
   .task-row, .project-row { grid-template-columns: 1fr; }
   .task-card, .task-add { min-height: 110px; }
   .greeting { font-size: 22px; }
