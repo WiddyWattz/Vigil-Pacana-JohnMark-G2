@@ -25,3 +25,6 @@ db.sqlite3
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local editor/tool settings
+.claude/
