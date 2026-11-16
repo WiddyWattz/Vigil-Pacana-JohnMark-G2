@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Project apps
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -92,6 +94,13 @@ if not DATABASES["default"]["ENGINE"].endswith("postgresql"):
 
 
 # --- Authentication -----------------------------------------------------------
+
+# Custom user model with a role, contact number and profile photo (accounts/models.py).
+AUTH_USER_MODEL = "accounts.User"
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "dashboards:home"  # dashboards:home sends each user to their role's dashboard
+LOGOUT_REDIRECT_URL = "accounts:login"
 
 # Django hashes passwords with PBKDF2-SHA256 by default; these validators enforce strong passwords.
 AUTH_PASSWORD_VALIDATORS = [
