@@ -1,0 +1,23 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Edit Trip{% endblock %}
+{% block greeting %}Edit Trip{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+  <form method="post" novalidate class="form">
+    {% csrf_token %}
+    <p class="muted-text">You can rename this trip and add notes. GPS readings and trip statistics come from the recorded ride and can't be edited.</p>
+    {% include "partials/field.html" with field=form.title %}
+    <div class="field{% if form.notes.errors %} has-error{% endif %}">
+      <label for="{{ form.notes.id_for_label }}">Notes</label>
+      <textarea name="{{ form.notes.html_name }}" id="{{ form.notes.id_for_label }}" rows="4" maxlength="500" placeholder="e.g. Heavy traffic on Banilad road">{{ form.notes.value|default:"" }}</textarea>
+      {% if form.notes.errors %}<p class="field-error">{{ form.notes.errors|join:" " }}</p>{% endif %}
+      <p class="field-help">Up to 500 characters.</p>
+    </div>
+    <div class="form-actions">
+      <a href="{% url 'trips:detail' trip.pk %}" class="btn-ghost">Cancel</a>
+      <button type="submit" class="btn-pill">Save Changes</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

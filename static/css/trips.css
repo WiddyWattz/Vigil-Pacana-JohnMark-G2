@@ -58,3 +58,42 @@
 }
 
 .choice input[type=radio] { width: 18px; height: 18px; flex: none; }
+
+/* Trip history */
+.totals-card { margin-bottom: 20px; }
+.totals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.totals strong { display: block; font-size: 32px; font-weight: 700; line-height: 1.1; }
+.totals span { font-size: 12.5px; color: #bdbdbd; }
+.trip-link { color: #000; text-decoration: none; }
+.trip-link:hover { text-decoration: underline; }
+.sub-line { display: block; margin-top: 4px; }
+.row-actions { text-align: right; }
+a.btn-mini { text-decoration: none; display: inline-block; }
+.breadcrumb { font-size: 13.5px; color: #444; margin: -10px 0 18px; }
+.breadcrumb a { color: #000; font-weight: 600; text-decoration: none; }
+.link-light { color: #fff; font-weight: 700; }
+
+.detail-grid { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-areas: "summary route" "chart route" "chart alerts"; gap: 20px; }
+.summary-card { grid-area: summary; }
+.route-card { grid-area: route; }
+.chart-card { grid-area: chart; }
+.detail-grid .alerts-card { grid-area: alerts; }
+.dark-stats > div { background: #1c1c1c; }
+.dark-stats span { color: #bdbdbd; }
+.summary-card .desc b { color: #fff; }
+.notes { background: #1c1c1c; border-radius: 10px; padding: 12px 14px; font-size: 13.5px; margin: 12px 0 0; }
+.route { width: 100%; max-width: 300px; display: block; margin: 0 auto; background: #f4f4f4; border-radius: 12px; }
+.route-line { fill: none; stroke: #000; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.route-start { fill: #fff; stroke: #000; stroke-width: 2.5; }
+.route-end { fill: #000; }
+.speed-chart { width: 100%; height: 190px; display: block; overflow: visible; }
+.speed-area { fill: #ececec; }
+.speed-line { fill: none; stroke: #000; stroke-width: 2; stroke-linejoin: round; }
+.limit-dash { stroke: #8a8a8a; stroke-width: 1.5; stroke-dasharray: 6 5; }
+.form textarea { width: 100%; padding: 10px 13px; border: 1px solid #bdbdbd; border-radius: 9px; font: inherit; font-size: 14px; resize: vertical; }
+.form textarea:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(0, 0, 0, .12); }
+
+@media (max-width: 900px) {
+  .detail-grid { grid-template-columns: 1fr; grid-template-areas: "summary" "chart" "route" "alerts"; }
+  .totals { grid-template-columns: repeat(2, 1fr); }
+}

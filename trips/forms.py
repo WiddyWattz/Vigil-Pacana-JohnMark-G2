@@ -70,3 +70,19 @@ class ReadingForm(forms.ModelForm):
         if accuracy is not None and accuracy < 0:
             raise forms.ValidationError("Accuracy cannot be negative.")
         return accuracy
+
+
+class TripEditForm(forms.ModelForm):
+    """Update: a rider can rename a trip and add notes. GPS data and stats can't be edited."""
+
+    class Meta:
+        model = Trip
+        fields = ["title", "notes"]
+        labels = {"title": "Trip name"}
+        widgets = {"notes": forms.Textarea(attrs={"rows": 4, "maxlength": 500})}
+
+    def clean_title(self):
+        title = self.cleaned_data["title"].strip()
+        if len(title) < 3:
+            raise forms.ValidationError("Trip name must be at least 3 characters.")
+        return title
