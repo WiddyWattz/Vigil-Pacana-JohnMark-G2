@@ -89,8 +89,10 @@ pip install -r requirements.txt
 ### 2. Create the Supabase database
 
 1. Create a project at [supabase.com](https://supabase.com) and set a database password.
-2. Click **Connect** → **Connection string** → **URI**, and choose **Session pooler**.
-3. Copy the string and replace `[YOUR-PASSWORD]` with your database password.
+2. Click **Connect** → **Connection string** → **URI**, and choose **Session pooler**
+   (the "Direct connection" host only works on IPv6 networks).
+3. Copy the string and replace `[YOUR-PASSWORD]` with your database password. If the password has
+   special characters (`? @ : / # + ,` …), URL-encode them, e.g. `?` → `%3F`, `+` → `%2B`, `,` → `%2C`.
 
 ### 3. Configure `.env`
 
@@ -114,10 +116,12 @@ Open http://127.0.0.1:8000/ — you'll land on the login page.
 ### 5. Run the tests
 
 ```bash
-python manage.py test
+python manage.py test --keepdb
 ```
 
-Django creates a temporary `test_postgres` database on the same server and deletes it afterwards.
+Django runs the tests in a separate `test_postgres` database on the same server, and each test is
+rolled back, so your real data is never touched. `--keepdb` keeps that test database between runs:
+Supabase's connection pooler holds connections open, which otherwise blocks Django from deleting it.
 
 ---
 
