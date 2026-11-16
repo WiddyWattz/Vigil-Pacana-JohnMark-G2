@@ -9,7 +9,7 @@ This repository is the **IM2 (Information Management 2) web application**:
 
 - **Author:** John Mark P. Pacaña — Section G2
 - **Stack:** Python Django (backend + templates), PostgreSQL on Supabase, Django built-in authentication
-- **Design:** black & white, based on the provided login and dashboard templates
+- **Design:** black & white
 
 ---
 
