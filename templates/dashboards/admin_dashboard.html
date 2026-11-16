@@ -25,8 +25,8 @@
     <div class="bar" role="img" aria-label="{{ active_ring.percent }}% of accounts active"><span style="width: {{ active_ring.percent }}%"></span></div>
     <div class="mini-boxes">
       <a href="{% url 'dashboards:manage_users' %}?role=RIDER" class="mini grey"><svg class="ico"><use href="#i-gauge"/></svg><strong>{{ rider_count }}</strong><span>Riders</span></a>
-      <div class="mini"><svg class="ico"><use href="#i-plus"/></svg><strong>{{ new_this_week }}</strong><span>New this week</span></div>
-      <div class="mini"><svg class="ico"><use href="#i-check"/></svg><strong>{{ active_count }}</strong><span>Active</span></div>
+      <a href="{% url 'trips:list' %}" class="mini"><svg class="ico"><use href="#i-chart"/></svg><strong>{{ trip_count }}</strong><span>Trips</span></a>
+      <div class="mini"><svg class="ico"><use href="#i-alert"/></svg><strong>{{ alert_total }}</strong><span>Speed alerts</span></div>
     </div>
   </section>
 
@@ -79,6 +79,28 @@
       <article class="task-card"><h3>No sign-ins yet</h3></article>
       {% endfor %}
       <a href="{% url 'dashboards:manage_users' %}" class="task-add"><svg class="ico"><use href="#i-plus"/></svg>Manage users</a>
+    </div>
+  </section>
+
+  <section class="card latest-trips">
+    <div class="card-head"><h2>Latest rider trips</h2><span class="muted">{{ trips_this_week }} this week</span>
+      <a href="{% url 'trips:list' %}" class="archive">All trips <svg class="ico"><use href="#i-arrow"/></svg></a></div>
+    <div class="table-wrap">
+      <table class="users">
+        <thead><tr><th>Trip</th><th>Rider</th><th>Date</th><th>Distance</th><th>Top speed</th><th>Alerts</th></tr></thead>
+        <tbody>
+        {% for t in latest_trips %}
+          <tr>
+            <td><a class="trip-link" href="{% url 'trips:detail' t.pk %}"><b>{{ t.title }}</b></a>{% if t.is_active %} <span class="status on">In progress</span>{% endif %}</td>
+            <td>@{{ t.rider.username }}</td>
+            <td>{{ t.started_at|date:"M j, g:i A" }}</td>
+            <td>{% if t.is_active %}—{% else %}{{ t.distance_km }} km{% endif %}</td>
+            <td>{% if t.is_active %}—{% else %}{{ t.max_speed_kmh|floatformat:0 }} km/h{% endif %}</td>
+            <td>{{ t.alert_count }}</td>
+          </tr>
+        {% empty %}<tr><td colspan="6" class="empty">No trips recorded yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
     </div>
   </section>
 

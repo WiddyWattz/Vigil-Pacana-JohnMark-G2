@@ -20,6 +20,7 @@
     {% if user.is_admin_role %}
     <p class="nav-heading">ADMINISTRATION</p>
     <nav class="nav" aria-label="Administration">
+      <a href="{% url 'trips:list' %}" class="{% if active == 'trips' %}active{% endif %}"><svg class="ico"><use href="#i-chart"/></svg>All Trips</a>
       <a href="{% url 'dashboards:manage_users' %}?role=RIDER"><svg class="ico"><use href="#i-gauge"/></svg>Riders</a>
       <a href="{% url 'dashboards:manage_users' %}?role=ADMIN"><svg class="ico"><use href="#i-shield"/></svg>Administrators</a>
       {% if user.is_staff %}<a href="{% url 'admin:index' %}"><svg class="ico"><use href="#i-db"/></svg>Django Admin</a>{% endif %}
@@ -28,6 +29,7 @@
     <p class="nav-heading">RIDING</p>
     <nav class="nav" aria-label="Riding">
       <a href="{% url 'trips:start' %}" class="{% if active == 'start_trip' %}active{% endif %}"><svg class="ico"><use href="#i-gauge"/></svg>Start Trip</a>
+      <a href="{% url 'trips:list' %}" class="{% if active == 'trips' %}active{% endif %}"><svg class="ico"><use href="#i-chart"/></svg>Trip History</a>
       <a href="{% url 'accounts:profile' %}#speed-limit"><svg class="ico"><use href="#i-alert"/></svg>Speed Limit</a>
     </nav>
     {% endif %}

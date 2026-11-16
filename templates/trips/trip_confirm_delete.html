@@ -1,0 +1,21 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Delete Trip{% endblock %}
+{% block greeting %}Delete Trip{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+  <form method="post" class="form">
+    {% csrf_token %}
+    <h2 class="card-title">Delete "{{ trip.title }}"?</h2>
+    <p class="muted-text">
+      {% if trip.rider != user %}This trip was recorded by <b>@{{ trip.rider.username }}</b>. {% endif %}
+      {% if trip.is_active %}This trip is still in progress and will be discarded. {% endif %}
+      Its {{ reading_count }} GPS reading{{ reading_count|pluralize }} and {{ alert_count }} speed alert{{ alert_count|pluralize }} will also be deleted. This can't be undone.
+    </p>
+    <div class="form-actions">
+      <a href="{% url 'trips:detail' trip.pk %}" class="btn-ghost">Cancel</a>
+      <button type="submit" class="btn-pill">Delete Trip</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

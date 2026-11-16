@@ -145,3 +145,93 @@ class EndTripTests(TripTestCase):
     def test_haversine(self):
         # 1 degree of latitude is ~111.19 km
         self.assertAlmostEqual(haversine_km(0, 0, 1, 0), 111.19, places=1)
+
+
+class TripHistoryTests(TripTestCase):
+    def setUp(self):
+        super().setUp()
+        self.mine = self.make_trip(status=Trip.Status.COMPLETED, distance_km=5, max_speed_kmh=70)
+        self.mine.title = "My commute"
+        self.mine.save()
+        self.theirs = self.make_trip(rider=self.other, status=Trip.Status.COMPLETED)
+        self.theirs.title = "Other rider trip"
+        self.theirs.save()
+
+    def test_rider_lists_only_own_trips(self):
+        resp = self.client.get(reverse("trips:list"))
+        self.assertContains(resp, "My commute")
+        self.assertNotContains(resp, "Other rider trip")
+
+    def test_search_and_status_filter(self):
+        self.assertNotContains(self.client.get(reverse("trips:list"), {"q": "nothing-matches"}), "My commute")
+        self.assertNotContains(self.client.get(reverse("trips:list"), {"status": "ACTIVE"}), "My commute")
+        self.assertContains(self.client.get(reverse("trips:list"), {"q": "commute"}), "My commute")
+
+    def test_rider_cannot_view_edit_or_delete_others_trip(self):
+        for name in ("trips:detail", "trips:edit", "trips:delete"):
+            self.assertEqual(self.client.get(reverse(name, args=[self.theirs.pk])).status_code, 404, name)
+        self.assertEqual(self.client.post(reverse("trips:delete", args=[self.theirs.pk])).status_code, 404)
+        self.assertTrue(Trip.objects.filter(pk=self.theirs.pk).exists())
+
+    def test_detail_shows_alerts_and_chart(self):
+        start = timezone.now() - timedelta(minutes=1)
+        trip = self.make_trip()
+        self.post_readings(trip, [reading(0, 50, start=start), reading(5, 75, lat=10.331, start=start)])
+        trip.finish()
+        resp = self.client.get(reverse("trips:detail", args=[trip.pk]))
+        self.assertContains(resp, "Speed alerts (1)")
+        self.assertContains(resp, 'class="speed-line"')
+
+    def test_edit_own_trip_with_validation(self):
+        url = reverse("trips:edit", args=[self.mine.pk])
+        self.assertContains(self.client.post(url, {"title": "x", "notes": ""}), "at least 3 characters")
+        self.assertContains(self.client.post(url, {"title": "Fine", "notes": "n" * 501}), "at most 500 characters")
+        resp = self.client.post(url, {"title": "Sunday ride", "notes": "Light traffic"})
+        self.assertRedirects(resp, reverse("trips:detail", args=[self.mine.pk]))
+        self.mine.refresh_from_db()
+        self.assertEqual((self.mine.title, self.mine.notes), ("Sunday ride", "Light traffic"))
+
+    def test_edit_cannot_change_stats(self):
+        self.client.post(reverse("trips:edit", args=[self.mine.pk]), {"title": "Sunday ride", "max_speed_kmh": 1, "rider": self.other.pk})
+        self.mine.refresh_from_db()
+        self.assertEqual((float(self.mine.max_speed_kmh), self.mine.rider), (70.0, self.rider))
+
+    def test_delete_own_trip_removes_readings(self):
+        start = timezone.now() - timedelta(minutes=1)
+        trip = self.make_trip()
+        self.post_readings(trip, [reading(0, 70, start=start)])
+        self.assertContains(self.client.get(reverse("trips:delete", args=[trip.pk])), "1 GPS reading")
+        resp = self.client.post(reverse("trips:delete", args=[trip.pk]))
+        self.assertRedirects(resp, reverse("trips:list"))
+        self.assertFalse(Trip.objects.filter(pk=trip.pk).exists())
+        self.assertFalse(SpeedAlert.objects.exists())
+
+    def test_admin_sees_all_trips_and_can_filter_by_rider(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(reverse("trips:list"))
+        self.assertContains(resp, "My commute")
+        self.assertContains(resp, "Other rider trip")
+        resp = self.client.get(reverse("trips:list"), {"rider": self.other.pk})
+        self.assertNotContains(resp, "My commute")
+        self.assertEqual(self.client.get(reverse("trips:detail", args=[self.mine.pk])).status_code, 200)
+
+    def test_admin_can_delete_but_not_edit_riders_trip(self):
+        self.client.force_login(self.admin)
+        self.assertEqual(self.client.get(reverse("trips:edit", args=[self.mine.pk])).status_code, 404)
+        resp = self.client.post(reverse("trips:delete", args=[self.mine.pk]), follow=True)
+        self.assertContains(resp, "recorded by rider")
+        self.assertFalse(Trip.objects.filter(pk=self.mine.pk).exists())
+
+    def test_history_requires_login(self):
+        self.client.logout()
+        resp = self.client.get(reverse("trips:list"))
+        self.assertRedirects(resp, f"{reverse('accounts:login')}?next={reverse('trips:list')}")
+
+    def test_dashboards_show_trip_data(self):
+        resp = self.client.get(reverse("dashboards:rider_dashboard"))
+        self.assertContains(resp, "My commute")
+        self.assertContains(resp, "Trip History")
+        self.client.force_login(self.admin)
+        resp = self.client.get(reverse("dashboards:admin_dashboard"))
+        self.assertContains(resp, "Latest rider trips")
+        self.assertContains(resp, "Other rider trip")
