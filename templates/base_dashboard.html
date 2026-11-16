@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{# Dashboard layout from the provided dashboard template: white sidebar + main content area. #}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock %}
+{% block body_class %}dash-page{% endblock %}
+{% block body %}
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{% url 'dashboards:home' %}"><svg class="ico brand-ico"><use href="#i-logo"/></svg>Vigil</a>
+
+    <nav class="nav" aria-label="Main">
+      <a href="{% url 'dashboards:home' %}" class="{% if active == 'dashboard' %}active{% endif %}"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+      {% if user.is_admin_role %}
+      <a href="{% url 'dashboards:manage_users' %}" class="{% if active == 'users' %}active{% endif %}"><svg class="ico"><use href="#i-users"/></svg>Manage Users</a>
+      {% endif %}
+      <a href="{% url 'accounts:profile' %}" class="{% if active == 'profile' %}active{% endif %}"><svg class="ico"><use href="#i-user"/></svg>My Profile</a>
+      <a href="{% url 'accounts:change_password' %}" class="{% if active == 'password' %}active{% endif %}"><svg class="ico"><use href="#i-lock"/></svg>Password</a>
+    </nav>
+
+    {% if user.is_admin_role %}
+    <p class="nav-heading">ADMINISTRATION</p>
+    <nav class="nav" aria-label="Administration">
+      <a href="{% url 'dashboards:manage_users' %}?role=RIDER"><svg class="ico"><use href="#i-gauge"/></svg>Riders</a>
+      <a href="{% url 'dashboards:manage_users' %}?role=ADMIN"><svg class="ico"><use href="#i-shield"/></svg>Administrators</a>
+      {% if user.is_staff %}<a href="{% url 'admin:index' %}"><svg class="ico"><use href="#i-db"/></svg>Django Admin</a>{% endif %}
+    </nav>
+    {% else %}
+    <p class="nav-heading">RIDING</p>
+    <nav class="nav" aria-label="Riding">
+      <a href="{% url 'accounts:profile' %}#speed-limit"><svg class="ico"><use href="#i-gauge"/></svg>Speed Limit</a>
+    </nav>
+    {% endif %}
+
+    <p class="nav-heading">ACCOUNT</p>
+    <div class="nav-role"><svg class="ico"><use href="#i-shield"/></svg>{{ user.get_role_display }}</div>
+
+    <form method="post" action="{% url 'accounts:logout' %}" class="nav logout">
+      {% csrf_token %}
+      <button type="submit"><svg class="ico"><use href="#i-logout"/></svg>Logout</button>
+    </form>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" type="button" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Open menu"><svg class="ico"><use href="#i-menu"/></svg></button>
+      <h1 class="greeting">{% block greeting %}Hi, {{ user.first_name|default:user.username }}!{% endblock %}</h1>
+      <div class="top-actions">
+        {% block top_actions %}{% endblock %}
+        <a href="{% url 'accounts:profile' %}" class="top-avatar" aria-label="My profile">{% include "partials/avatar.html" with u=user %}</a>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

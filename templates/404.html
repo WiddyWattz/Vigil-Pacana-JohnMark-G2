@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Not found{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock %}
+{% block body_class %}dash-page{% endblock %}
+{% block body %}
+<main class="error-page">
+  <div class="card dark error-card">
+    <svg class="ico big"><use href="#i-alert"/></svg>
+    <h1>404 · Page not found</h1>
+    <p>The page you're looking for doesn't exist.</p>
+    <a href="{% url 'dashboards:home' %}" class="btn-light">Go to my dashboard</a>
+  </div>
+</main>
+{% endblock %}

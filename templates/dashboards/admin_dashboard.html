@@ -1,0 +1,99 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block top_actions %}
+<a href="{% url 'dashboards:manage_users' %}" class="btn-pill"><svg class="ico"><use href="#i-users"/></svg>Manage Users</a>
+<form method="get" action="{% url 'dashboards:manage_users' %}" class="top-search">
+  <label class="sr-only" for="top-q">Search users</label>
+  <input id="top-q" name="q" type="search" placeholder="Search users…">
+  <button class="icon-btn" type="submit" aria-label="Search users"><svg class="ico"><use href="#i-search"/></svg></button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="grid">
+
+  <section class="card dark overview">
+    <div class="card-head"><h2>Overall information</h2>
+      <a href="{% url 'dashboards:manage_users' %}" class="icon-link" aria-label="Manage users"><svg class="ico"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="big-stats">
+      <div><strong>{{ total_users }}</strong><span>Registered<br>users</span></div>
+      <i class="vr"></i>
+      <div><strong>{{ admin_count }}</strong><span>Administrators</span></div>
+    </div>
+    <div class="bar" role="img" aria-label="{{ active_ring.percent }}% of accounts active"><span style="width: {{ active_ring.percent }}%"></span></div>
+    <div class="mini-boxes">
+      <a href="{% url 'dashboards:manage_users' %}?role=RIDER" class="mini grey"><svg class="ico"><use href="#i-gauge"/></svg><strong>{{ rider_count }}</strong><span>Riders</span></a>
+      <div class="mini"><svg class="ico"><use href="#i-plus"/></svg><strong>{{ new_this_week }}</strong><span>New this week</span></div>
+      <div class="mini"><svg class="ico"><use href="#i-check"/></svg><strong>{{ active_count }}</strong><span>Active</span></div>
+    </div>
+  </section>
+
+  {% include "partials/weekly_chart.html" with title="Weekly activity" %}
+
+  <section class="card progress">
+    <div class="card-head"><h2>Rider Status</h2><svg class="ico muted"><use href="#i-chart"/></svg></div>
+    <p class="sub"><b>{{ ring.percent }}%</b> of riders are active</p>
+    <p class="overline">OVERVIEW</p>
+    <div class="progress-body">
+      <ul class="dots">
+        <li class="on">Active ({{ active_riders }})</li>
+        <li class="mid">Inactive ({{ inactive_riders }})</li>
+        <li>Admins ({{ admin_count }})</li>
+      </ul>
+      {% include "partials/ring.html" %}
+    </div>
+    <div class="card-actions">
+      <a href="{% url 'dashboards:manage_users' %}" class="round-dark" aria-label="Manage users"><svg class="ico"><use href="#i-users"/></svg></a>
+      <a href="{% url 'dashboards:manage_users' %}?role=RIDER" class="btn-ghost">View Riders</a>
+    </div>
+  </section>
+
+  <section class="card goals">
+    <div class="card-head">
+      <h2>Newest Accounts</h2>
+      <span class="badge-ring">{{ recent_users|length }}</span>
+      <a href="{% url 'dashboards:manage_users' %}" class="icon-link" aria-label="All users"><svg class="ico"><use href="#i-arrow"/></svg></a>
+    </div>
+    <ul class="checks">
+      {% for u in recent_users %}
+      <li class="{% if u.is_active %}done{% endif %}"><span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>{{ u.display_name }} <small>· {{ u.get_role_display }}</small></li>
+      {% empty %}<li>No users yet</li>{% endfor %}
+    </ul>
+  </section>
+
+  <section class="tasks">
+    <div class="tasks-head"><h2>Recent sign-ins ({{ recent_logins|length }})</h2>
+      <a href="{% url 'dashboards:manage_users' %}" class="archive">All users <svg class="ico"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="task-row">
+      {% for a in recent_logins %}
+      <article class="task-card">
+        {% include "partials/avatar.html" with u=a.user size="sm" %}
+        <h3>{{ a.user.display_name }}</h3>
+        <p class="task-meta">{{ a.timestamp|date:"M j, g:i A" }} · {{ a.device }}</p>
+        <span class="corner"><svg class="ico"><use href="#i-check"/></svg></span>
+      </article>
+      {% empty %}
+      <article class="task-card"><h3>No sign-ins yet</h3></article>
+      {% endfor %}
+      <a href="{% url 'dashboards:manage_users' %}" class="task-add"><svg class="ico"><use href="#i-plus"/></svg>Manage users</a>
+    </div>
+  </section>
+
+  <section class="projects">
+    <h2 class="section-title">Role breakdown</h2>
+    <div class="project-row">
+      {% for b in breakdown %}
+      <a class="card dark project" href="{% url 'dashboards:manage_users' %}{{ b.filter }}">
+        <div class="project-head"><h3>{{ b.title }}</h3>{% include "partials/ring.html" with ring=b.ring small=1 %}</div>
+        <ul class="bullets"><li>{{ b.count }} account{{ b.count|pluralize }}</li></ul>
+        <p class="desc">{{ b.note }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

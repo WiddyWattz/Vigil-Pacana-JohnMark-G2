@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Access denied{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock %}
+{% block body_class %}dash-page{% endblock %}
+{% block body %}
+<main class="error-page">
+  <div class="card dark error-card">
+    <svg class="ico big"><use href="#i-lock"/></svg>
+    <h1>403 · Access denied</h1>
+    <p>You don't have permission to view this page.</p>
+    <a href="{% url 'dashboards:home' %}" class="btn-light">Go to my dashboard</a>
+  </div>
+</main>
+{% endblock %}

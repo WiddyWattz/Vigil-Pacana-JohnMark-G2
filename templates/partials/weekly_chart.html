@@ -1,0 +1,23 @@
+{# "Weekly process" card from the template, drawn as an SVG line chart from real daily counts. #}
+<section class="card glass weekly">
+  <div class="card-head">
+    <h2>{{ title }}</h2>
+    <svg class="ico muted"><use href="#i-clock"/></svg>
+  </div>
+  <div class="legend">
+    {% for name in legend %}<span class="lg lg-{{ forloop.counter }}"><i></i>{{ name }}</span>{% endfor %}
+  </div>
+  <svg class="chart" viewBox="-6 -14 {{ chart.w|add:12 }} {{ chart.h|add:20 }}" preserveAspectRatio="none" role="img" aria-label="{{ title }} for the last 7 days">
+    <defs>
+      <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#9a9a9a"/></pattern>
+    </defs>
+    {% for line in chart.lines %}
+      {% if forloop.first %}<polygon points="{{ line.area }}" fill="url(#dots)" opacity=".55"/>{% endif %}
+      <polyline points="{{ line.points }}" class="line line-{{ forloop.counter }}" vector-effect="non-scaling-stroke"/>
+    {% endfor %}
+  </svg>
+  <ol class="days">
+    {% for d in chart.labels %}<li class="{% if forloop.last %}today{% endif %}">{{ d }}</li>{% endfor %}
+  </ol>
+  <p class="chart-note">{% for line in chart.lines %}{{ legend|slice:forloop.counter|last }}: <b>{{ line.total }}</b>{% if not forloop.last %} · {% endif %}{% endfor %} this week</p>
+</section>

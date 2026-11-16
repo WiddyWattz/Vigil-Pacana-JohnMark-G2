@@ -1,0 +1,103 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Rider Dashboard{% endblock %}
+
+{% block top_actions %}
+<a href="{% url 'accounts:profile' %}" class="btn-pill"><svg class="ico"><use href="#i-pencil"/></svg>Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid">
+
+  {# Black "Over all information" card #}
+  <section class="card dark overview">
+    <div class="card-head"><h2>Account overview</h2>
+      <a href="{% url 'accounts:profile' %}" class="icon-link" aria-label="Open profile"><svg class="ico"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="big-stats">
+      <div><strong>{{ total_logins }}</strong><span>Sign-ins<br>all time</span></div>
+      <i class="vr"></i>
+      <div><strong>{{ days_member }}</strong><span>Days as<br>a member</span></div>
+    </div>
+    <div class="bar" role="img" aria-label="Profile {{ ring.percent }}% complete"><span style="width: {{ ring.percent }}%"></span></div>
+    <div class="mini-boxes">
+      <a href="{% url 'accounts:profile' %}#speed-limit" class="mini grey"><svg class="ico"><use href="#i-gauge"/></svg><strong>{{ user.speed_limit }}</strong><span>km/h limit</span></a>
+      <div class="mini"><svg class="ico"><use href="#i-clock"/></svg><strong>{{ logins_this_week }}</strong><span>This week</span></div>
+      <div class="mini"><svg class="ico"><use href="#i-check"/></svg><strong>{{ ring.percent }}%</strong><span>Profile</span></div>
+    </div>
+  </section>
+
+  {% include "partials/weekly_chart.html" with title="Weekly activity" %}
+
+  {# White "Month Progress" card #}
+  <section class="card progress">
+    <div class="card-head"><h2>Profile Progress</h2><svg class="ico muted"><use href="#i-chart"/></svg></div>
+    <p class="sub"><b>{{ ring.percent }}%</b> of your profile is complete</p>
+    <p class="overline">OVERVIEW</p>
+    <div class="progress-body">
+      <ul class="dots">
+        {% for label, ok in checklist %}<li class="{% if ok %}on{% endif %}">{{ label }}</li>{% endfor %}
+      </ul>
+      {% include "partials/ring.html" %}
+    </div>
+    <div class="card-actions">
+      <a href="{% url 'accounts:profile' %}" class="round-dark" aria-label="Edit profile"><svg class="ico"><use href="#i-pencil"/></svg></a>
+      <a href="{% url 'accounts:profile' %}" class="btn-ghost">Complete Profile</a>
+    </div>
+  </section>
+
+  {# "Month Goal's" checklist card #}
+  <section class="card goals">
+    <div class="card-head">
+      <h2>Profile Checklist</h2>
+      <span class="badge-ring">{{ checklist_done }}/{{ checklist|length }}</span>
+      <a href="{% url 'accounts:profile' %}" class="icon-link" aria-label="Edit profile"><svg class="ico"><use href="#i-pencil"/></svg></a>
+    </div>
+    <ul class="checks">
+      {% for label, ok in checklist %}
+      <li class="{% if ok %}done{% endif %}"><span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>{{ label }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {# "Task in process" cards #}
+  <section class="tasks">
+    <div class="tasks-head"><h2>Recent sign-ins ({{ recent_logins|length }})</h2></div>
+    <div class="task-row">
+      {% for a in recent_logins %}
+      <article class="task-card">
+        <svg class="ico task-ico"><use href="#i-device"/></svg>
+        <h3>{{ a.device }}</h3>
+        <p class="task-meta">{{ a.timestamp|date:"M j, g:i A" }}</p>
+        <span class="corner"><svg class="ico"><use href="#i-check"/></svg></span>
+      </article>
+      {% empty %}
+      <article class="task-card"><h3>No sign-ins yet</h3></article>
+      {% endfor %}
+      <a href="{% url 'accounts:change_password' %}" class="task-add"><svg class="ico"><use href="#i-plus"/></svg>Change password</a>
+    </div>
+  </section>
+
+  {# "Last project's" black cards #}
+  <section class="projects">
+    <h2 class="section-title">Account summary</h2>
+    <div class="project-row">
+      <article class="card dark project">
+        <div class="project-head"><h3>My Account</h3>{% include "partials/ring.html" with small=1 %}</div>
+        <ul class="bullets"><li>{{ user.get_role_display }} · {% if user.is_active %}Active{% else %}Inactive{% endif %}</li></ul>
+        <p class="desc"><b>Member since:</b> {{ user.date_joined|date:"F j, Y" }}</p>
+      </article>
+      <article class="card dark project">
+        <div class="project-head"><h3>Speed Alert</h3><span class="chip">{{ user.speed_limit }}</span></div>
+        <ul class="bullets"><li>Alert above {{ user.speed_limit }} km/h</li></ul>
+        <p class="desc">Change your threshold anytime in <a href="{% url 'accounts:profile' %}#speed-limit">your profile</a>.</p>
+      </article>
+      <article class="card dark project">
+        <div class="project-head"><h3>Security</h3><span class="chip"><svg class="ico"><use href="#i-lock"/></svg></span></div>
+        <ul class="bullets"><li>Password encrypted (hashed)</li></ul>
+        <p class="desc"><b>Last sign-in:</b> {{ user.last_login|date:"M j, Y g:i A"|default:"—" }}</p>
+      </article>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

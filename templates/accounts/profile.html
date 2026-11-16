@@ -1,0 +1,61 @@
+{% extends "base_dashboard.html" %}
+{% block title %}My Profile{% endblock %}
+{% block greeting %}My Profile{% endblock %}
+
+{% block content %}
+<div class="profile-grid">
+  <section class="card">
+    <form method="post" enctype="multipart/form-data" novalidate class="form">
+      {% csrf_token %}
+      <div class="photo-row">
+        <div class="photo-preview" data-photo-preview>{% include "partials/avatar.html" with u=user size="lg" %}</div>
+        <div>
+          <h2 class="card-title">{{ user.display_name }}</h2>
+          <p class="muted-text">@{{ user.username }} · {{ user.get_role_display }}</p>
+          <label class="btn-ghost file-btn" for="id_profile_photo">Upload photo</label>
+          <input type="file" name="profile_photo" id="id_profile_photo" accept="image/*" class="sr-only">
+          {% if form.profile_photo.errors %}<p class="field-error">{{ form.profile_photo.errors|join:" " }}</p>{% endif %}
+          <p class="field-help">JPG or PNG, up to 2 MB.</p>
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}<div class="form-alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+      <div class="row-2">
+        {% include "partials/field.html" with field=form.first_name autocomplete="given-name" %}
+        {% include "partials/field.html" with field=form.last_name autocomplete="family-name" %}
+      </div>
+      <div class="row-2">
+        {% include "partials/field.html" with field=form.username autocomplete="username" %}
+        {% include "partials/field.html" with field=form.email type="email" autocomplete="email" %}
+      </div>
+      <div class="row-2">
+        {% include "partials/field.html" with field=form.contact_number placeholder="09XXXXXXXXX" autocomplete="tel" %}
+        <div id="speed-limit">{% include "partials/field.html" with field=form.speed_limit help="Vigil alerts you above this speed (10–200 km/h)." %}</div>
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'dashboards:home' %}" class="btn-ghost">Cancel</a>
+        <button type="submit" class="btn-pill">Save Changes</button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="card dark profile-side">
+    <h2>Profile Progress</h2>
+    <div class="side-ring">
+      <svg class="ring" viewBox="0 0 100 100" role="img" aria-label="{{ completion }} percent">
+        <circle cx="50" cy="50" r="40" class="ring-track"/>
+        <circle cx="50" cy="50" r="40" class="ring-bar" stroke-dasharray="{% widthratio completion 100 251 %} 251.33" transform="rotate(-90 50 50)"/>
+        <text x="50" y="50" class="ring-text" dominant-baseline="central" text-anchor="middle">{{ completion }}%</text>
+      </svg>
+    </div>
+    <ul class="checks light">
+      {% for label, ok in checklist %}<li class="{% if ok %}done{% endif %}"><span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>{{ label }}</li>{% endfor %}
+    </ul>
+    <dl class="meta">
+      <dt>Member since</dt><dd>{{ user.date_joined|date:"F j, Y" }}</dd>
+      <dt>Last sign-in</dt><dd>{{ user.last_login|date:"M j, Y g:i A"|default:"—" }}</dd>
+    </dl>
+    <a href="{% url 'accounts:change_password' %}" class="btn-light">Change Password</a>
+  </aside>
+</div>
+{% endblock %}

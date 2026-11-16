@@ -1,0 +1,2 @@
+{# Profile photo, or the user's initials when no photo is uploaded. #}
+<span class="avatar{% if size %} avatar-{{ size }}{% endif %}">{% if u.profile_photo %}<img src="{{ u.profile_photo.url }}" alt="{{ u.display_name }}">{% else %}{{ u.initials }}{% endif %}</span>
