@@ -1,0 +1,42 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+{% block title %}Start Trip{% endblock %}
+{% block greeting %}Start a Trip{% endblock %}
+{% block styles %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/trips.css' %}">{% endblock %}
+
+{% block content %}
+<div class="trip-start-grid">
+  <section class="card">
+    <form method="post" novalidate class="form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-alert" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+      {% include "partials/field.html" with field=form.title placeholder="e.g. Morning ride to work" %}
+
+      <fieldset class="choice-group{% if form.source.errors %} has-error{% endif %}">
+        <legend>{{ form.source.label }}</legend>
+        {% for choice in form.source %}
+        <label class="choice">
+          {{ choice.tag }}
+          <span><b>{{ choice.choice_label }}</b>
+            <small>{% if choice.data.value == "GPS" %}Uses your phone's GPS. Allow location access when the browser asks.{% else %}For demos on a laptop with no GPS: plays a sample ride around Cebu IT Park. Saved and labeled as simulated.{% endif %}</small>
+          </span>
+        </label>
+        {% endfor %}
+        {% if form.source.errors %}<p class="field-error">{{ form.source.errors|join:" " }}</p>{% endif %}
+      </fieldset>
+
+      <div class="form-actions">
+        <a href="{% url 'dashboards:home' %}" class="btn-ghost">Cancel</a>
+        <button type="submit" class="btn-pill"><svg class="ico"><use href="#i-gauge"/></svg>Start Trip</button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="card dark limit-card">
+    <p class="overline">YOUR SPEED LIMIT</p>
+    <p class="limit-big">{{ user.speed_limit }}<span>km/h</span></p>
+    <p class="desc">Vigil warns you with a sound and vibration whenever your speed goes above this limit during the trip.</p>
+    <a href="{% url 'accounts:profile' %}#speed-limit" class="btn-light">Change limit</a>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+/* Trip tracking & history pages — same black & white card style as the dashboard template. */
+
+/* Start trip */
+.trip-start-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+.choice-group { border: 0; padding: 0; margin: 4px 0 16px; }
+.choice-group legend { font-size: 13.5px; font-weight: 600; margin-bottom: 10px; }
+.choice { display: flex; gap: 12px; align-items: flex-start; border: 1.5px solid #d0d0d0; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
+.choice:has(input:checked) { border-color: #000; background: #f4f4f4; }
+.choice input { margin-top: 3px; accent-color: #000; }
+.choice small { display: block; color: #555; font-size: 12.5px; margin-top: 3px; }
+.limit-card .overline { color: #bdbdbd; }
+.limit-big { font-size: 64px; font-weight: 700; margin: 0 0 10px; line-height: 1; }
+.limit-big span { font-size: 16px; font-weight: 500; color: #bdbdbd; margin-left: 6px; }
+.limit-card .desc { margin-bottom: 18px; font-size: 13px; }
+
+/* Live tracking */
+.track-grid { display: grid; grid-template-columns: 1.1fr 1fr; grid-template-areas: "gauge stats" "gauge alerts"; gap: 20px; }
+.gauge-card { grid-area: gauge; display: flex; flex-direction: column; transition: background .2s, color .2s; }
+.stats-card { grid-area: stats; }
+.alerts-card { grid-area: alerts; }
+.tag-light { font-size: 12px; font-weight: 600; border: 1.5px solid currentColor; border-radius: 999px; padding: 3px 10px; }
+.gauge { width: 100%; max-width: 440px; margin: 10px auto 0; display: block; }
+.gauge-track { fill: none; stroke: #333; stroke-width: 14; stroke-linecap: round; }
+.gauge-bar { fill: none; stroke: #fff; stroke-width: 14; stroke-linecap: round; transition: stroke-dasharray .4s; }
+.gauge-limit { stroke: #9a9a9a; stroke-width: 3; stroke-linecap: round; }
+.gauge-value { font-size: 52px; font-weight: 800; fill: #fff; }
+.gauge-unit { font-size: 13px; fill: #bdbdbd; }
+.limit-line { text-align: center; color: #bdbdbd; margin: 6px 0 14px; }
+.limit-line b { color: #fff; }
+
+/* Over the limit: the card flips to white and the banner pulses */
+.gauge-card.over { background: #fff; color: #000; box-shadow: inset 0 0 0 4px #000; }
+.gauge-card.over .gauge-track { stroke: #e2e2e2; }
+.gauge-card.over .gauge-bar { stroke: #000; }
+.gauge-card.over .gauge-value { fill: #000; }
+.gauge-card.over .limit-line, .gauge-card.over .limit-line b { color: #000; }
+.over-banner { display: flex; align-items: center; justify-content: center; gap: 10px; background: #000; color: #fff; border-radius: 12px; padding: 12px; font-weight: 700; animation: pulse 0.8s ease-in-out infinite alternate; }
+.over-banner[hidden] { display: none; }
+@keyframes pulse { from { opacity: 1; } to { opacity: .55; } }
+
+.gps-status { font-size: 12px; font-weight: 600; color: #555; }
+.trip-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.trip-stats > div { background: #f2f2f2; border-radius: 12px; padding: 14px 8px; text-align: center; }
+.trip-stats strong { display: block; font-size: 24px; font-weight: 700; }
+.trip-stats span { font-size: 12px; color: #555; font-weight: 600; }
+.track-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.alert-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 230px; overflow-y: auto; }
+.alert-log li { display: flex; justify-content: space-between; background: #000; color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 13.5px; }
+.alert-log li span { color: #bdbdbd; }
+.alert-log li.none { background: #f2f2f2; color: #555; }
+
+@media (max-width: 900px) {
+  .trip-start-grid { grid-template-columns: 1fr; }
+  .track-grid { grid-template-columns: 1fr; grid-template-areas: "gauge" "stats" "alerts"; }
+}
+@media (max-width: 480px) {
+  .trip-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+.choice input[type=radio] { width: 18px; height: 18px; flex: none; }
+
+/* Trip history */
+.totals-card { margin-bottom: 20px; }
+.totals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.totals strong { display: block; font-size: 32px; font-weight: 700; line-height: 1.1; }
+.totals span { font-size: 12.5px; color: #bdbdbd; }
+.trip-link { color: #000; text-decoration: none; }
+.trip-link:hover { text-decoration: underline; }
+.sub-line { display: block; margin-top: 4px; }
+.row-actions { text-align: right; }
+a.btn-mini { text-decoration: none; display: inline-block; }
+.breadcrumb { font-size: 13.5px; color: #444; margin: -10px 0 18px; }
+.breadcrumb a { color: #000; font-weight: 600; text-decoration: none; }
+.link-light { color: #fff; font-weight: 700; }
+
+.detail-grid { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-areas: "summary route" "chart route" "chart alerts"; gap: 20px; }
+.summary-card { grid-area: summary; }
+.route-card { grid-area: route; }
+.chart-card { grid-area: chart; }
+.detail-grid .alerts-card { grid-area: alerts; }
+.dark-stats > div { background: #1c1c1c; }
+.dark-stats span { color: #bdbdbd; }
+.summary-card .desc b { color: #fff; }
+.notes { background: #1c1c1c; border-radius: 10px; padding: 12px 14px; font-size: 13.5px; margin: 12px 0 0; }
+.route { width: 100%; max-width: 300px; display: block; margin: 0 auto; background: #f4f4f4; border-radius: 12px; }
+.route-line { fill: none; stroke: #000; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.route-start { fill: #fff; stroke: #000; stroke-width: 2.5; }
+.route-end { fill: #000; }
+.speed-chart { width: 100%; height: 190px; display: block; overflow: visible; }
+.speed-area { fill: #ececec; }
+.speed-line { fill: none; stroke: #000; stroke-width: 2; stroke-linejoin: round; }
+.limit-dash { stroke: #8a8a8a; stroke-width: 1.5; stroke-dasharray: 6 5; }
+.form textarea { width: 100%; padding: 10px 13px; border: 1px solid #bdbdbd; border-radius: 9px; font: inherit; font-size: 14px; resize: vertical; }
+.form textarea:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(0, 0, 0, .12); }
+
+@media (max-width: 900px) {
+  .detail-grid { grid-template-columns: 1fr; grid-template-areas: "summary" "chart" "route" "alerts"; }
+  .totals { grid-template-columns: repeat(2, 1fr); }
+}

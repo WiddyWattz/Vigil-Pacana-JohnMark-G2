@@ -8,6 +8,7 @@ urlpatterns = [
     path("", RedirectView.as_view(pattern_name="dashboards:home", permanent=False)),
     path("accounts/", include("accounts.urls")),
     path("dashboard/", include("dashboards.urls")),
+    path("trips/", include("trips.urls")),
     path("django-admin/", admin.site.urls),  # Django's built-in admin site
 ]
 

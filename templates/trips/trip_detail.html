@@ -1,0 +1,67 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+{% block title %}{{ trip.title }}{% endblock %}
+{% block greeting %}{{ trip.title }}{% endblock %}
+{% block styles %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/trips.css' %}">{% endblock %}
+{% block top_actions %}
+  {% if can_edit %}<a href="{% url 'trips:edit' trip.pk %}" class="btn-pill"><svg class="ico"><use href="#i-pencil"/></svg>Edit</a>{% endif %}
+  <a href="{% url 'trips:delete' trip.pk %}" class="btn-ghost">Delete</a>
+{% endblock %}
+
+{% block content %}
+<p class="breadcrumb"><a href="{% url 'trips:list' %}">‹ {% if user.is_admin_role %}All Trips{% else %}Trip History{% endif %}</a>
+  · {{ trip.started_at|date:"l, F j, Y · g:i A" }}
+  {% if user.is_admin_role %} · Rider: <b>{{ trip.rider.display_name }}</b> (@{{ trip.rider.username }}){% endif %}
+  {% if trip.source == "SIMULATED" %} · <span class="status">Demo ride</span>{% endif %}
+</p>
+
+{% if trip.is_active %}
+<div class="form-alert">This trip is still in progress.{% if can_edit %} <a class="link-light" href="{% url 'trips:track' trip.pk %}">Resume tracking</a>{% endif %}</div>
+{% endif %}
+
+<div class="detail-grid">
+  <section class="card dark summary-card">
+    <div class="trip-stats dark-stats">
+      <div><strong>{{ trip.distance_km }}</strong><span>km</span></div>
+      <div><strong>{{ trip.duration_display }}</strong><span>duration</span></div>
+      <div><strong>{{ trip.avg_speed_kmh|floatformat:0 }}</strong><span>avg km/h</span></div>
+      <div><strong>{{ trip.max_speed_kmh|floatformat:0 }}</strong><span>top km/h</span></div>
+    </div>
+    <p class="desc">Speed limit for this trip: <b>{{ trip.speed_limit }} km/h</b> · {{ reading_count }} GPS readings · {{ alerts|length }} alert{{ alerts|length|pluralize }}</p>
+    {% if trip.notes %}<p class="notes">{{ trip.notes|linebreaksbr }}</p>{% endif %}
+  </section>
+
+  <section class="card route-card">
+    <div class="card-head"><h2>Route</h2></div>
+    {% if route %}
+    <svg class="route" viewBox="0 0 200 200" role="img" aria-label="Route outline">
+      <polyline points="{{ route.points }}" class="route-line"/>
+      <circle cx="{{ route.start.0 }}" cy="{{ route.start.1 }}" r="5" class="route-start"/>
+      <circle cx="{{ route.end.0 }}" cy="{{ route.end.1 }}" r="5" class="route-end"/>
+    </svg>
+    <p class="field-help">○ start · ● end</p>
+    {% else %}<p class="muted-text">Not enough GPS readings to draw a route.</p>{% endif %}
+  </section>
+
+  <section class="card chart-card">
+    <div class="card-head"><h2>Speed over time</h2><span class="legend"><span class="lg"><i></i>Speed</span><span class="lg lg-2"><i></i>Limit</span></span></div>
+    {% if speed_chart %}
+    <svg class="speed-chart" viewBox="0 -6 {{ speed_chart.w }} {{ speed_chart.h|add:12 }}" preserveAspectRatio="none" role="img" aria-label="Speed over time">
+      <polygon points="{{ speed_chart.area }}" class="speed-area"/>
+      <polyline points="{{ speed_chart.points }}" class="speed-line" vector-effect="non-scaling-stroke"/>
+      <line x1="0" x2="{{ speed_chart.w }}" y1="{{ speed_chart.limit_y }}" y2="{{ speed_chart.limit_y }}" class="limit-dash" vector-effect="non-scaling-stroke"/>
+    </svg>
+    <p class="field-help">Scale: 0 – {{ speed_chart.top }} km/h, from start to end of the trip.</p>
+    {% else %}<p class="muted-text">Not enough GPS readings to draw a chart.</p>{% endif %}
+  </section>
+
+  <section class="card alerts-card">
+    <div class="card-head"><h2>Speed alerts ({{ alerts|length }})</h2></div>
+    <ul class="alert-log">
+      {% for a in alerts %}
+      <li><b>{{ a.speed_kmh|floatformat:0 }} km/h</b> <span>+{{ a.over_by|floatformat:0 }} over · {{ a.triggered_at|time:"g:i:s A" }}</span></li>
+      {% empty %}<li class="none">No speed alerts on this trip.</li>{% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}
