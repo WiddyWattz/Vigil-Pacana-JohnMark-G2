@@ -1,0 +1,68 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+{% block title %}Tracking · {{ trip.title }}{% endblock %}
+{% block greeting %}{{ trip.title }}{% endblock %}
+{% block styles %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/trips.css' %}">{% endblock %}
+
+{% block content %}
+{# Settings for static/js/trip-tracker.js are passed through data-* attributes. #}
+<div class="track-grid" id="tracker"
+     data-readings-url="{% url 'trips:readings' trip.pk %}"
+     data-csrf="{{ csrf_token }}"
+     data-limit="{{ trip.speed_limit }}"
+     data-source="{{ trip.source }}">
+
+  <section class="card dark gauge-card" id="gauge-card">
+    <div class="card-head">
+      <h2>Live speed</h2>
+      <span class="tag-light">{{ trip.get_source_display }}</span>
+    </div>
+    <svg class="gauge" viewBox="0 0 220 130" role="img" aria-label="Speedometer">
+      <path d="M20 115 A90 90 0 0 1 200 115" class="gauge-track"/>
+      <path d="M20 115 A90 90 0 0 1 200 115" class="gauge-bar" id="gauge-bar" pathLength="100" stroke-dasharray="0 100"/>
+      <line id="gauge-limit" x1="110" y1="22" x2="110" y2="36" class="gauge-limit"/>
+      <text x="110" y="98" text-anchor="middle" class="gauge-value" id="speed-now">{{ stats.current_speed_kmh }}</text>
+      <text x="110" y="120" text-anchor="middle" class="gauge-unit">km/h</text>
+    </svg>
+    <p class="limit-line">Limit <b>{{ trip.speed_limit }} km/h</b></p>
+    <div class="over-banner" id="over-banner" role="alert" hidden>
+      <svg class="ico"><use href="#i-alert"/></svg> Slow down! You're over your speed limit.
+    </div>
+  </section>
+
+  <section class="card stats-card">
+    <div class="card-head"><h2>This trip</h2><span class="gps-status" id="gps-status">Not started</span></div>
+    <div class="trip-stats">
+      <div><strong id="stat-distance">{{ stats.distance_km }}</strong><span>km</span></div>
+      <div><strong id="stat-max">{{ stats.max_speed_kmh }}</strong><span>top km/h</span></div>
+      <div><strong id="stat-alerts">{{ stats.alerts }}</strong><span>alerts</span></div>
+      <div><strong id="stat-readings">{{ stats.readings }}</strong><span>readings</span></div>
+    </div>
+    <p class="muted-text">Started {{ trip.started_at|date:"M j, g:i A" }}. Readings are saved every few seconds, so you can close this page and come back.</p>
+
+    <div class="track-actions">
+      <button type="button" class="btn-pill" id="btn-track">
+        <svg class="ico"><use href="#i-gauge"/></svg><span>Start tracking</span>
+      </button>
+      <form method="post" action="{% url 'trips:end' trip.pk %}" id="end-form">
+        {% csrf_token %}
+        <button type="submit" class="btn-ghost">End &amp; save trip</button>
+      </form>
+    </div>
+    <p class="field-help" id="tracker-error" role="status"></p>
+  </section>
+
+  <section class="card alerts-card">
+    <div class="card-head"><h2>Speed alerts</h2></div>
+    <ul class="alert-log" id="alert-log">
+      {% for a in trip.alerts.all %}
+      <li><b>{{ a.speed_kmh|floatformat:0 }} km/h</b> <span>{{ a.triggered_at|time:"g:i:s A" }}</span></li>
+      {% empty %}
+      <li class="none">No alerts yet. Ride safe!</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/trip-tracker.js' %}"></script>{% endblock %}

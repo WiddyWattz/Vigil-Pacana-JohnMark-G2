@@ -27,7 +27,8 @@
     {% else %}
     <p class="nav-heading">RIDING</p>
     <nav class="nav" aria-label="Riding">
-      <a href="{% url 'accounts:profile' %}#speed-limit"><svg class="ico"><use href="#i-gauge"/></svg>Speed Limit</a>
+      <a href="{% url 'trips:start' %}" class="{% if active == 'start_trip' %}active{% endif %}"><svg class="ico"><use href="#i-gauge"/></svg>Start Trip</a>
+      <a href="{% url 'accounts:profile' %}#speed-limit"><svg class="ico"><use href="#i-alert"/></svg>Speed Limit</a>
     </nav>
     {% endif %}
 
